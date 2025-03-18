@@ -13,7 +13,7 @@ local function open_git_diff(file_path)
 
   -- Open the file in the current buffer
   vim.cmd("edit " .. vim.fn.fnameescape(full_path))
-  vim.cmd("setlocal diff")  -- Mark this buffer for diff view
+  vim.cmd("setlocal diff scrollbind")  -- Mark this buffer for diff view and sync scrolling
   
   -- Get the git diff output
   local handle = io.popen("git show HEAD:" .. vim.fn.shellescape(file_path))
@@ -25,7 +25,7 @@ local function open_git_diff(file_path)
   
   -- Open a new vertical split and populate it with the diff
   vim.cmd("vert new")
-  vim.cmd("setlocal buftype=nofile filetype=diff nowrap")
+  vim.cmd("setlocal buftype=nofile filetype=diff nowrap scrollbind")  -- Sync scrolling
   vim.cmd("setlocal modifiable")  -- Allow modifications before inserting text
   vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(diff_output, "\n"))
   vim.cmd("setlocal nomodifiable")  -- Lock the buffer again after inserting text
