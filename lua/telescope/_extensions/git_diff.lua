@@ -10,7 +10,10 @@ local function open_git_diff(file_path)
   -- Check if the file exists in the working directory
   local git_root = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel"))
   local full_path = git_root .. "/" .. file_path
-
+  
+  -- Get the filetype from the file path
+  local filetype = vim.filetype.match({ filename = file_path })
+  
   -- Open the file in the current buffer
   vim.cmd("edit " .. vim.fn.fnameescape(full_path))
   vim.cmd("setlocal diff scrollbind")  -- Mark this buffer for diff view and sync scrolling
@@ -25,9 +28,15 @@ local function open_git_diff(file_path)
   
   -- Open a new vertical split and populate it with the diff
   vim.cmd("vert new")
-  vim.cmd("setlocal buftype=nofile filetype=diff nowrap scrollbind")  -- Sync scrolling
+  vim.cmd("setlocal buftype=nofile nowrap scrollbind")  -- Sync scrolling
   vim.cmd("setlocal modifiable")  -- Allow modifications before inserting text
   vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(diff_output, "\n"))
+  
+  -- Apply the same filetype to the diff buffer
+  if filetype then
+    vim.cmd("setlocal filetype=" .. filetype)
+  end
+  
   vim.cmd("setlocal nomodifiable")  -- Lock the buffer again after inserting text
   vim.cmd("setlocal diff")  -- Mark this buffer for diff view
 end
